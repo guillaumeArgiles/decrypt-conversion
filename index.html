@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Générateur d'URL UTM</title>
+    <title>Decrypt Conversion</title>
     <style>
         :root {
             --color-1: #fff;
@@ -129,7 +129,7 @@
 
         </div>
 
-        <form id="utmForm">
+        <form id="decryptForm">
             <div>
                 <label>Segment Conversion Id</label>
                 <input type="text" id="segmentConversionId" required>
@@ -147,7 +147,7 @@
     </div>
 
     <script>
-        document.getElementById('utmForm').addEventListener('submit', async function (e) {
+        document.getElementById('decryptForm').addEventListener('submit', async function (e) {
             e.preventDefault();
 
             const segmentConversionId = document.getElementById('segmentConversionId').value;
