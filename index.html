@@ -147,42 +147,38 @@
     </div>
 
     <script>
-        document.getElementById('utmForm').addEventListener('submit', function (e) {
+        document.getElementById('utmForm').addEventListener('submit', async function (e) {
             e.preventDefault();
+
             const segmentConversionId = document.getElementById('segmentConversionId').value;
             const decryptKey = document.getElementById('decryptKey').value;
-            const decryptedData = await decryptData(segmentConversionId, decryptKey);
-            document.getElementById('result').innerHTML = decryptedData;
+            const decrypted = await decryptData(segmentConversionId, decryptKey);
+
+            document.querySelector('.result').style.display = 'block';
+            document.querySelector('.result').innerHTML = `
+                <h2>Résultats</h2>
+                <p>Timestamp: ${decrypted.timestamp}<br>
+                Email: ${decrypted.email}<br>
+                Version: ${decrypted.download_version}</p>
+            `;
         });
 
-        // Fonction pour déchiffrer
         async function decryptData(encryptedData, key) {
-            // Décoder le base64
-            const decoder = new TextDecoder();
-            const data = Uint8Array.from(atob(encryptedData), c => c.charCodeAt(0));
+            const encrypted = atob(encryptedData);
+            let decrypted = '';
+            for (let i = 0; i < encrypted.length; i++) {
+                const charCode = encrypted.charCodeAt(i) ^ key.charCodeAt(i % key.length);
+                decrypted += String.fromCharCode(charCode);
+            }
 
-            // Extraire l'IV et les données chiffrées
-            const iv = data.slice(0, 12);
-            const ciphertext = data.slice(12);
-
-            // Importer la clé
-            const cryptoKey = await crypto.subtle.importKey(
-                'raw',
-                new TextEncoder().encode(key),
-                { name: 'AES-GCM', length: 256 },
-                false,
-                ['decrypt']
-            );
-
-            // Déchiffrer
-            const decryptedData = await crypto.subtle.decrypt(
-                { name: 'AES-GCM', iv },
-                cryptoKey,
-                ciphertext
-            );
-
-            return decoder.decode(decryptedData);
+            const [timestamp, email, download_version] = decrypted.split('#');
+            return {
+                timestamp,
+                email,
+                download_version
+            };
         }
+
     </script>
 </body>
 
