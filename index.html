@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur d'URL UTM</title>
+    <style>
+        :root {
+            --color-1: #fff;
+            --color-2: #000;
+            --color-3: #a4dbe8;
+            --color-4: #bde9c9;
+            --color-5: #decde7;
+            --color-6: #f8e08e;
+            --color-7: #f4f4f4;
+            --color-8: #595959;
+            --color-9: #dadada;
+            --color-10: #268095;
+            --color-11: #e8f6f9;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: var(--color-1);
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            height: 4rem;
+            background-color: var(--color-3);
+            padding: 2rem;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            color: var(--color-2);
+            text-align: left;
+            margin-top: 2rem;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0px auto;
+            background-color: var(--color-1);
+            padding: 2rem 2rem 0px;
+        }
+
+        label {
+            display: block;
+            font-size: 1rem;
+            font-weight: medium;
+            color: var(--color-2);
+            margin-bottom: 0.5rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 1rem;
+            border: 1px solid var(--color-9);
+            margin-bottom: 1rem;
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+        }
+
+        input:focus {
+            border-color: var(--color-2);
+            outline: none;
+        }
+
+        button {
+            width: 200px;
+            background-color: var(--color-2);
+            color: var(--color-1);
+            padding: 1rem;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .result {
+            display: none;
+            padding: 2rem;
+            background-color: var(--color-7);
+            margin-bottom: 2rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .result h2 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: var(--color-2);
+            text-transform: uppercase;
+        }
+
+        .result p {
+            word-break: break-all;
+            color: var(--color-2);
+        }
+
+        .error {
+            color: red;
+            font-size: 0.875rem;
+            display: none;
+            margin-top: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        input.input-error,
+        input.input-error:focus,
+        input.input-error:active {
+            border: 1px solid red;
+            margin-bottom: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Decrypt Conversion</h1>
+    </header>
+    <div class="container">
+        <div class="result">
+
+        </div>
+
+        <form id="utmForm">
+            <div>
+                <label>Segment Conversion Id</label>
+                <input type="text" id="segmentConversionId" required>
+            </div>
+
+            <div>
+                <label>Decrypt Key</label>
+                <input type="text" id="decryptKey" required>
+
+            </div>
+
+            <button type="submit">Decrypt</button>
+        </form>
+
+    </div>
+
+    <script>
+        document.getElementById('utmForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const segmentConversionId = document.getElementById('segmentConversionId').value;
+            const decryptKey = document.getElementById('decryptKey').value;
+            const decryptedData = await decryptData(segmentConversionId, decryptKey);
+            document.getElementById('result').innerHTML = decryptedData;
+        });
+
+        // Fonction pour déchiffrer
+        async function decryptData(encryptedData, key) {
+            // Décoder le base64
+            const decoder = new TextDecoder();
+            const data = Uint8Array.from(atob(encryptedData), c => c.charCodeAt(0));
+
+            // Extraire l'IV et les données chiffrées
+            const iv = data.slice(0, 12);
+            const ciphertext = data.slice(12);
+
+            // Importer la clé
+            const cryptoKey = await crypto.subtle.importKey(
+                'raw',
+                new TextEncoder().encode(key),
+                { name: 'AES-GCM', length: 256 },
+                false,
+                ['decrypt']
+            );
+
+            // Déchiffrer
+            const decryptedData = await crypto.subtle.decrypt(
+                { name: 'AES-GCM', iv },
+                cryptoKey,
+                ciphertext
+            );
+
+            return decoder.decode(decryptedData);
+        }
+    </script>
+</body>
+
+</html>
