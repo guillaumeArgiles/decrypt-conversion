@@ -156,7 +156,7 @@
 
             document.querySelector('.result').style.display = 'block';
             document.querySelector('.result').innerHTML = `
-                <h2>Résultats</h2>
+                <h2>Résults</h2>
                 <p>Timestamp: ${decrypted.timestamp}<br>
                 Email: ${decrypted.email}<br>
                 Version: ${decrypted.download_version}</p>
@@ -173,8 +173,8 @@
 
             const [timestamp, email, download_version] = decrypted.split('#');
             return {
-                timestamp,
                 email,
+                timestamp,
                 download_version
             };
         }
