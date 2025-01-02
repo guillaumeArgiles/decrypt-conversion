@@ -157,9 +157,11 @@
             document.querySelector('.result').style.display = 'block';
             document.querySelector('.result').innerHTML = `
                 <h2>Résults</h2>
-                <p>Timestamp: ${decrypted.timestamp}<br>
-                Email: ${decrypted.email}<br>
-                Version: ${decrypted.download_version}</p>
+                <p>
+                    Email: ${decrypted.email}<br>
+                    Version: ${decrypted.download_version}<br>
+                    Timestamp: ${decrypted.timestamp}
+                </p>
             `;
         });
 
@@ -171,7 +173,7 @@
                 decrypted += String.fromCharCode(charCode);
             }
 
-            const [timestamp, email, download_version] = decrypted.split('#');
+            const [email, timestamp, download_version] = decrypted.split('#');
             return {
                 email,
                 timestamp,
